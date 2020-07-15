@@ -2,9 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Measurement struct {
@@ -25,6 +28,9 @@ func (h *measurementHandlers) Measurements(w http.ResponseWriter, r *http.Reques
 	switch r.Method {
 	case "GET":
 		h.get(w, r)
+		return
+	case "POST":
+		h.post(w, r)
 		return
 	}
 }
@@ -81,6 +87,40 @@ func (h *measurementHandlers) GetMeasurement(w http.ResponseWriter, r *http.Requ
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
+}
+
+// POST
+func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+
+	defer r.Body.Close()
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	ct := r.Header.Get("content-type")
+	if ct != "application/json" {
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		// TODO: let user know what gone bad
+		return
+	}
+
+	var measurement Measurement
+	err = json.Unmarshal(bodyBytes, &measurement)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	measurement.ID = fmt.Sprintf("%d", time.Now().UnixNano())
+	h.Lock()
+	h.fakeDB[measurement.ID] = measurement
+	defer h.Unlock()
+
 }
 
 func MakeMeasurementsHandlers() *measurementHandlers {

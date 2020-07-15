@@ -125,19 +125,6 @@ func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 
 func MakeMeasurementsHandlers() *measurementHandlers {
 	return &measurementHandlers{
-		fakeDB: map[string]Measurement{
-			"id1": Measurement{
-				ID:          "id1",
-				Name:        "testName",
-				Temperature: "21.00",
-				Humidity:    "54.22",
-			},
-			"id2": Measurement{
-				ID:          "id2",
-				Name:        "testName2",
-				Temperature: "30.32",
-				Humidity:    "60.22",
-			},
-		},
+		fakeDB: map[string]Measurement{},
 	}
 }

@@ -1,15 +1,15 @@
 package main
 
 import (
-	//"encoding/json"
 	"fmt"
 	"github.com/KNaiskes/measurementsTH-API/api"
+	"github.com/KNaiskes/measurementsTH-API/db"
 	"net/http"
-	//"strings"
-	//"sync"
 )
 
 func main() {
+	db.InitDB()
+
 	measurementHandlers := api.MakeMeasurementsHandlers()
 
 	http.HandleFunc("/measurements", measurementHandlers.Measurements)

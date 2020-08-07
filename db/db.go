@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
-	//	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -11,21 +11,24 @@ import (
 )
 
 const (
-	URI        = "mongodb://172.17.0.2:27017"
-	TIMEOUT    = 10 * time.Second
-	DATABASE   = "measurements"
-	COLLECTION = "dht22"
+	URI         = "mongodb://172.17.0.2:27017"
+	TIMEOUT     = 10 * time.Second
+	GET_TIMEOUT = 30 * time.Second
+	DATABASE    = "measurements"
+	COLLECTION  = "dht22"
 )
 
 var (
-	collection *mongo.Collection
-	ctx        = context.TODO()
+	collection  *mongo.Collection
+	ctx         = context.TODO()
+	client, err = mongo.Connect(ctx, options.Client().ApplyURI(URI))
+	_, cancel   = context.WithTimeout(ctx, TIMEOUT)
 )
 
 func InitDB() {
-	_, cancel := context.WithTimeout(ctx, TIMEOUT)
+	//	_, cancel := context.WithTimeout(ctx, TIMEOUT)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(URI))
+	//client, err := mongo.Connect(ctx, options.Client().ApplyURI(URI))
 	/*
 		defer func() {
 			if err = client.Disconnect(ctx); err != nil {
@@ -44,13 +47,32 @@ func InitDB() {
 	}
 
 	collection = client.Database(DATABASE).Collection(COLLECTION)
+}
 
-	// Close connection
-	/*
-		databases, err := client.ListDatabaseNames(ctx, bson.M{})
+func GetAll() bson.M {
+
+	collection = client.Database(DATABASE).Collection(COLLECTION)
+
+	var result bson.M
+	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
+	defer cancel()
+	cur, err := collection.Find(ctx, bson.D{})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
+		err := cur.Decode(&result)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
-		fmt.Println(databases)
-	*/
+		fmt.Println(result) // TODO: remove after testing
+	}
+	if err := cur.Err(); err != nil {
+		fmt.Println(err)
+	}
+
+	return result
 }

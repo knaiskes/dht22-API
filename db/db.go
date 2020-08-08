@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/KNaiskes/measurementsTH-API/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -49,30 +50,30 @@ func InitDB() {
 	collection = client.Database(DATABASE).Collection(COLLECTION)
 }
 
-func GetAll() bson.M {
+func GetAll() []models.Measurement {
 
 	collection = client.Database(DATABASE).Collection(COLLECTION)
+	results := []models.Measurement{}
 
-	var result bson.M
 	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
 	defer cancel()
-	cur, err := collection.Find(ctx, bson.D{})
 
+	cur, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	defer cur.Close(ctx)
+
 	for cur.Next(ctx) {
-		err := cur.Decode(&result)
+		row := models.Measurement{}
+
+		err = cur.Decode(&row)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(result) // TODO: remove after testing
-	}
-	if err := cur.Err(); err != nil {
-		fmt.Println(err)
+		results = append(results, row)
 	}
 
-	return result
+	return results
 }

@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/KNaiskes/measurementsTH-API/db"
+	"github.com/KNaiskes/measurementsTH-API/models"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -10,18 +12,11 @@ import (
 	"time"
 )
 
-type Measurement struct {
-	ID          string `json:id`
-	Name        string `json:name`
-	Temperature string `json:temperature`
-	Humidity    string `json:humidity`
-}
-
 //TODO: add a real database
 
 type measurementHandlers struct {
 	sync.Mutex
-	fakeDB map[string]Measurement
+	fakeDB map[string]models.Measurement
 }
 
 func (h *measurementHandlers) Measurements(w http.ResponseWriter, r *http.Request) {
@@ -38,19 +33,33 @@ func (h *measurementHandlers) Measurements(w http.ResponseWriter, r *http.Reques
 // GET Method
 
 func (h *measurementHandlers) get(w http.ResponseWriter, r *http.Request) {
-	measurements := make([]Measurement, len(h.fakeDB))
+	//	measurements := make([]Measurement, len(h.fakeDB))
 
 	h.Lock()
 
-	i := 0
-	for _, m := range h.fakeDB {
-		measurements[i] = m
-		i++
-	}
+	results := db.GetAll()
+	fmt.Printf("%T\n", results)
+
+	/*
+		measurements := make([]Measurement, len(results))
+		i := 0
+		for _, m := range results {
+			measurements[i] = m
+			i++
+		}
+	*/
+
+	/*
+		i := 0
+		for _, m := range h.fakeDB {
+			measurements[i] = m
+			i++
+		}
+	*/
 
 	h.Unlock()
 
-	jsonData, err := json.Marshal(measurements)
+	jsonData, err := json.Marshal(results)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -108,7 +117,7 @@ func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var measurement Measurement
+	var measurement models.Measurement
 	err = json.Unmarshal(bodyBytes, &measurement)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -125,6 +134,6 @@ func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 
 func MakeMeasurementsHandlers() *measurementHandlers {
 	return &measurementHandlers{
-		fakeDB: map[string]Measurement{},
+		fakeDB: map[string]models.Measurement{},
 	}
 }

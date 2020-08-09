@@ -8,8 +8,7 @@ import (
 )
 
 func main() {
-	db.InitDB()
-
+	db.Connect()
 	measurementHandlers := api.MakeMeasurementsHandlers()
 
 	http.HandleFunc("/measurements", measurementHandlers.Measurements)

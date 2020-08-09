@@ -26,17 +26,8 @@ var (
 	_, cancel   = context.WithTimeout(ctx, TIMEOUT)
 )
 
-func InitDB() {
-	//	_, cancel := context.WithTimeout(ctx, TIMEOUT)
+func Connect() {
 	defer cancel()
-	//client, err := mongo.Connect(ctx, options.Client().ApplyURI(URI))
-	/*
-		defer func() {
-			if err = client.Disconnect(ctx); err != nil {
-				panic(err)
-			}
-		}()
-	*/
 
 	err = client.Ping(ctx, readpref.Primary())
 	defer cancel()
@@ -46,13 +37,11 @@ func InitDB() {
 	} else {
 		fmt.Println("Connected to db")
 	}
-
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 }
 
 func GetAll() []models.Measurement {
-
 	collection = client.Database(DATABASE).Collection(COLLECTION)
+	fmt.Printf("%T\n", collection)
 	results := []models.Measurement{}
 
 	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)

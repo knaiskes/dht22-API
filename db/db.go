@@ -12,11 +12,12 @@ import (
 )
 
 const (
-	URI         = "mongodb://172.17.0.2:27017"
-	TIMEOUT     = 10 * time.Second
-	GET_TIMEOUT = 30 * time.Second
-	DATABASE    = "measurements"
-	COLLECTION  = "dht22"
+	URI            = "mongodb://172.17.0.2:27017"
+	TIMEOUT        = 10 * time.Second
+	GET_TIMEOUT    = 30 * time.Second
+	INSERT_TIMEOUT = 5 * time.Second
+	DATABASE       = "measurements"
+	COLLECTION     = "dht22"
 )
 
 var (
@@ -26,17 +27,8 @@ var (
 	_, cancel   = context.WithTimeout(ctx, TIMEOUT)
 )
 
-func InitDB() {
-	//	_, cancel := context.WithTimeout(ctx, TIMEOUT)
+func Connect() {
 	defer cancel()
-	//client, err := mongo.Connect(ctx, options.Client().ApplyURI(URI))
-	/*
-		defer func() {
-			if err = client.Disconnect(ctx); err != nil {
-				panic(err)
-			}
-		}()
-	*/
 
 	err = client.Ping(ctx, readpref.Primary())
 	defer cancel()
@@ -46,12 +38,9 @@ func InitDB() {
 	} else {
 		fmt.Println("Connected to db")
 	}
-
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 }
 
 func GetAll() []models.Measurement {
-
 	collection = client.Database(DATABASE).Collection(COLLECTION)
 	results := []models.Measurement{}
 
@@ -76,4 +65,14 @@ func GetAll() []models.Measurement {
 	}
 
 	return results
+}
+
+func InsertNewMeasurement(m models.Measurement) {
+	collection = client.Database(DATABASE).Collection(COLLECTION)
+	ctx, cancel = context.WithTimeout(context.Background(), INSERT_TIMEOUT)
+	defer cancel()
+	_, err := collection.InsertOne(ctx, m)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

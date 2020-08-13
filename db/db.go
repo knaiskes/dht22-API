@@ -12,11 +12,12 @@ import (
 )
 
 const (
-	URI         = "mongodb://172.17.0.2:27017"
-	TIMEOUT     = 10 * time.Second
-	GET_TIMEOUT = 30 * time.Second
-	DATABASE    = "measurements"
-	COLLECTION  = "dht22"
+	URI            = "mongodb://172.17.0.2:27017"
+	TIMEOUT        = 10 * time.Second
+	GET_TIMEOUT    = 30 * time.Second
+	INSERT_TIMEOUT = 5 * time.Second
+	DATABASE       = "measurements"
+	COLLECTION     = "dht22"
 )
 
 var (
@@ -41,7 +42,6 @@ func Connect() {
 
 func GetAll() []models.Measurement {
 	collection = client.Database(DATABASE).Collection(COLLECTION)
-	fmt.Printf("%T\n", collection)
 	results := []models.Measurement{}
 
 	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
@@ -65,4 +65,14 @@ func GetAll() []models.Measurement {
 	}
 
 	return results
+}
+
+func InsertNewMeasurement(m models.Measurement) {
+	collection = client.Database(DATABASE).Collection(COLLECTION)
+	ctx, cancel = context.WithTimeout(context.Background(), INSERT_TIMEOUT)
+	defer cancel()
+	_, err := collection.InsertOne(ctx, m)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

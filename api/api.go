@@ -12,8 +12,6 @@ import (
 	"time"
 )
 
-//TODO: add a real database
-
 type measurementHandlers struct {
 	sync.Mutex
 	fakeDB map[string]models.Measurement
@@ -38,7 +36,7 @@ func (h *measurementHandlers) get(w http.ResponseWriter, r *http.Request) {
 	h.Lock()
 
 	results := db.GetAll()
-	fmt.Printf("%T\n", results)
+	//fmt.Printf("%T\n", results)
 
 	/*
 		measurements := make([]Measurement, len(results))
@@ -127,7 +125,8 @@ func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 
 	measurement.ID = fmt.Sprintf("%d", time.Now().UnixNano())
 	h.Lock()
-	h.fakeDB[measurement.ID] = measurement
+	db.InsertNewMeasurement(measurement)
+	//	h.fakeDB[measurement.ID] = measurement
 	defer h.Unlock()
 
 }

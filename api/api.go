@@ -132,7 +132,5 @@ func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 }
 
 func MakeMeasurementsHandlers() *measurementHandlers {
-	return &measurementHandlers{
-		fakeDB: map[string]models.Measurement{},
-	}
+	return &measurementHandlers{}
 }

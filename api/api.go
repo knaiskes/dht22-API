@@ -31,30 +31,8 @@ func (h *measurementHandlers) Measurements(w http.ResponseWriter, r *http.Reques
 // GET Method
 
 func (h *measurementHandlers) get(w http.ResponseWriter, r *http.Request) {
-	//	measurements := make([]Measurement, len(h.fakeDB))
-
 	h.Lock()
-
 	results := db.GetAll()
-	//fmt.Printf("%T\n", results)
-
-	/*
-		measurements := make([]Measurement, len(results))
-		i := 0
-		for _, m := range results {
-			measurements[i] = m
-			i++
-		}
-	*/
-
-	/*
-		i := 0
-		for _, m := range h.fakeDB {
-			measurements[i] = m
-			i++
-		}
-	*/
-
 	h.Unlock()
 
 	jsonData, err := json.Marshal(results)
@@ -126,7 +104,6 @@ func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 	measurement.ID = fmt.Sprintf("%d", time.Now().UnixNano())
 	h.Lock()
 	db.InsertNewMeasurement(measurement)
-	//	h.fakeDB[measurement.ID] = measurement
 	defer h.Unlock()
 
 }

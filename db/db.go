@@ -67,6 +67,29 @@ func GetAll() []models.Measurement {
 	return results
 }
 
+func GetOne(id string) models.Measurement {
+	collection = client.Database(DATABASE).Collection(COLLECTION)
+	var result models.Measurement
+
+	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
+	defer cancel()
+
+	cur, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	filter := bson.M{"_id": id}
+	err = collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer cur.Close(ctx)
+
+	return result
+}
+
 func InsertNewMeasurement(m models.Measurement) {
 	collection = client.Database(DATABASE).Collection(COLLECTION)
 	ctx, cancel = context.WithTimeout(context.Background(), INSERT_TIMEOUT)

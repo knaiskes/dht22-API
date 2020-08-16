@@ -14,7 +14,6 @@ import (
 
 type measurementHandlers struct {
 	sync.Mutex
-	fakeDB map[string]models.Measurement
 }
 
 func (h *measurementHandlers) Measurements(w http.ResponseWriter, r *http.Request) {
@@ -56,12 +55,14 @@ func (h *measurementHandlers) GetMeasurement(w http.ResponseWriter, r *http.Requ
 	}
 
 	h.Lock()
-	measurement, ok := h.fakeDB[parts[2]]
+	measurement := db.GetOne(parts[2])
 	h.Unlock()
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	/*
+		if !ok {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	*/
 
 	jsonData, err := json.Marshal(measurement)
 	if err != nil {

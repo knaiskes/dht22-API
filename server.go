@@ -13,6 +13,7 @@ func main() {
 
 	http.HandleFunc("/measurements", measurementHandlers.Measurements)
 	http.HandleFunc("/measurements/", measurementHandlers.GetMeasurement)
+	http.HandleFunc("/measurements/name/", measurementHandlers.GetMeasurementsByName)
 
 	fmt.Println("Server started at port 8080")
 	err := http.ListenAndServe(":8080", nil)

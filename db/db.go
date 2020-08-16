@@ -90,6 +90,33 @@ func GetOne(id string) models.Measurement {
 	return result
 }
 
+func GetAllByName(name string) []models.Measurement {
+	collection = client.Database(DATABASE).Collection(COLLECTION)
+	results := []models.Measurement{}
+
+	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
+	defer cancel()
+
+	cur, err := collection.Find(ctx, bson.M{"name": name})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer cur.Close(ctx)
+
+	for cur.Next(ctx) {
+		row := models.Measurement{}
+
+		err = cur.Decode(&row)
+		if err != nil {
+			fmt.Println(err)
+		}
+		results = append(results, row)
+	}
+
+	return results
+}
+
 func InsertNewMeasurement(m models.Measurement) {
 	collection = client.Database(DATABASE).Collection(COLLECTION)
 	ctx, cancel = context.WithTimeout(context.Background(), INSERT_TIMEOUT)

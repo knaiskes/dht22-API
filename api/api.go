@@ -75,6 +75,35 @@ func (h *measurementHandlers) GetMeasurement(w http.ResponseWriter, r *http.Requ
 	w.Write(jsonData)
 }
 
+// GET measurements by name
+func (h *measurementHandlers) GetMeasurementsByName(w http.ResponseWriter, r *http.Request) {
+	parts := strings.Split(r.URL.String(), "/")
+	if len(parts) != 4 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	h.Lock()
+	measurement := db.GetAllByName(parts[3])
+	h.Unlock()
+	/*
+		if !ok {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	*/
+
+	jsonData, err := json.Marshal(measurement)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+
+	w.Header().Add("content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
 // POST
 func (h *measurementHandlers) post(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := ioutil.ReadAll(r.Body)

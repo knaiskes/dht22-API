@@ -67,9 +67,10 @@ func GetAll() []models.Measurement {
 	return results
 }
 
-func GetOne(id string) models.Measurement {
+func GetOne(id string) (m models.Measurement, e bool) {
 	collection = client.Database(DATABASE).Collection(COLLECTION)
 	var result models.Measurement
+	var empty bool = false
 
 	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
 	defer cancel()
@@ -85,9 +86,13 @@ func GetOne(id string) models.Measurement {
 		fmt.Println(err)
 	}
 
+	if (models.Measurement{}) == result {
+		empty = true
+	}
+
 	defer cur.Close(ctx)
 
-	return result
+	return result, empty
 }
 
 func GetAllByName(name string) []models.Measurement {

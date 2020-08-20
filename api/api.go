@@ -55,14 +55,13 @@ func (h *measurementHandlers) GetMeasurement(w http.ResponseWriter, r *http.Requ
 	}
 
 	h.Lock()
-	measurement := db.GetOne(parts[2])
+	measurement, notFound := db.GetOne(parts[2])
 	h.Unlock()
-	/*
-		if !ok {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-	*/
+
+	if notFound {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	jsonData, err := json.Marshal(measurement)
 	if err != nil {

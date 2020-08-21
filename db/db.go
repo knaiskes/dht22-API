@@ -131,3 +131,32 @@ func InsertNewMeasurement(m models.Measurement) {
 		fmt.Println(err)
 	}
 }
+
+func NameExists(name string) bool {
+
+	collection = client.Database(DATABASE).Collection(COLLECTION)
+	var result models.Measurement
+	var exists bool = true
+
+	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
+	defer cancel()
+
+	cur, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	filter := bson.M{"name": name}
+	err = collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if result.ID == "" {
+		exists = false
+	}
+
+	defer cur.Close(ctx)
+
+	return exists
+}

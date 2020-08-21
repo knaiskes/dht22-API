@@ -85,12 +85,11 @@ func (h *measurementHandlers) GetMeasurementsByName(w http.ResponseWriter, r *ht
 	h.Lock()
 	measurement := db.GetAllByName(parts[3])
 	h.Unlock()
-	/*
-		if !ok {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-	*/
+
+	if !db.NameExists(parts[3]) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
 	jsonData, err := json.Marshal(measurement)
 	if err != nil {

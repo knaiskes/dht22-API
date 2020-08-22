@@ -21,10 +21,10 @@ const (
 )
 
 var (
-	collection  *mongo.Collection
-	ctx         = context.TODO()
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI(URI))
-	_, cancel   = context.WithTimeout(ctx, TIMEOUT)
+	collection  *mongo.Collection = client.Database(DATABASE).Collection(COLLECTION)
+	ctx                           = context.TODO()
+	client, err                   = mongo.Connect(ctx, options.Client().ApplyURI(URI))
+	_, cancel                     = context.WithTimeout(ctx, TIMEOUT)
 )
 
 func Connect() {
@@ -41,7 +41,6 @@ func Connect() {
 }
 
 func GetAll() []models.Measurement {
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 	results := []models.Measurement{}
 
 	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
@@ -68,7 +67,6 @@ func GetAll() []models.Measurement {
 }
 
 func GetOne(id string) (m models.Measurement, e bool) {
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 	var result models.Measurement
 	var empty bool = false
 
@@ -96,7 +94,6 @@ func GetOne(id string) (m models.Measurement, e bool) {
 }
 
 func GetAllByName(name string) []models.Measurement {
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 	results := []models.Measurement{}
 
 	ctx, cancel = context.WithTimeout(context.Background(), GET_TIMEOUT)
@@ -123,7 +120,6 @@ func GetAllByName(name string) []models.Measurement {
 }
 
 func InsertNewMeasurement(m models.Measurement) {
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 	ctx, cancel = context.WithTimeout(context.Background(), INSERT_TIMEOUT)
 	defer cancel()
 	_, err := collection.InsertOne(ctx, m)
@@ -133,8 +129,6 @@ func InsertNewMeasurement(m models.Measurement) {
 }
 
 func NameExists(name string) bool {
-
-	collection = client.Database(DATABASE).Collection(COLLECTION)
 	var result models.Measurement
 	var exists bool = true
 

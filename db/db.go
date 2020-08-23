@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	URI            = "mongodb://172.17.0.2:27017"
+	URI            = "mongodb://dht22_db:27017" // dht22_db is the name of the docker container
 	TIMEOUT        = 10 * time.Second
 	GET_TIMEOUT    = 30 * time.Second
 	INSERT_TIMEOUT = 5 * time.Second

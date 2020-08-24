@@ -1,0 +1,44 @@
+* dht22-API
+A simple API written in Go for the temperature and humidity dht22 sensor.
+It supports GET and POST requests
+
+* Requirements
+- Go 1.14 or higher
+- MongoDB
+- mongo-go-driver
+OR
+- docker
+- docker-compose
+
+* Setup
+Due to a [[https://lists.archlinux.org/pipermail/arch-dev-public/2019-January/029430.html][license]]
+issue many Linux distributions removed MongoDB from their official repositories,
+as result it is easier to set up the project with Docker rather
+than compiling MongoDB ourselves.
+
+**** Install docker and docker-compose on Arch based distributions
+#+BEGIN_SRC
+$ pacman -S docker docker-compose
+#+END_SRC
+
+**** Get the source code
+#+begin_SRC
+$ git clone git@github.com:KNaiskes/dht22-API.git
+$ cd dht22-API
+#+END_SRC
+
+**** Run project
+***** Start docker
+#+BEGIN_SRC
+$ sudo systemctl start docker
+#+END_SRC
+
+***** Run project
+It will take some time the first time you run this command as it will have to pull
+the Go and MongoDB images
+#+BEGIN_SRC
+$ docker-compose up # You may have to run this command with sudo
+#+END_SRC
+
+Visit [[http://localhost:8080/measurements][localhost:8080/measurements]]
+to verify that everything work as they should, you are expected to see an empty list

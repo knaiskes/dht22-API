@@ -42,3 +42,25 @@ $ docker-compose up # You may have to run this command with sudo
 
 Visit [[http://localhost:8080/measurements][localhost:8080/measurements]]
 to verify that everything work as they should, you are expected to see an empty list
+* GET and POST requests description
+** GET request
+
+| Path                 | Result                                                                    |
+|----------------------+---------------------------------------------------------------------------|
+| /measurements        | Returns a list with all measurements or an empty list                     |
+| /measurements/{id}   | Returns the one measurement with the specified {id} or 404                |
+| /measurements/{name} | Returns all measurements from the sensor with the {name} or an empty list |
+
+** POST request
+POST request consists of three optional parameters (id is assigned automatically by the server).
+
+Example of POST request with [[https://en.wikipedia.org/wiki/CURL][cURL]]
+#+BEGIN_SRC
+curl -d '{
+
+    "name":"basement",
+    "temperature":"17.25",
+    "humidity":"21.33"
+
+}' -H "Content-Type: application/json" -X POST http://localhost:8080/measurements
+#+END_SRC

@@ -1,12 +1,15 @@
 
 # Table of Contents
 
-1.  [dht22-API](#org974c2b4)
-2.  [Requirements](#orgdbe5deb)
-3.  [Setup](#org867a2e3)
+1.  [dht22-API](#orgfadf536)
+2.  [Requirements](#org2ff2401)
+3.  [Setup](#orge330080)
+4.  [GET and POST requests description](#orge594679)
+    1.  [GET request](#org5c43d03)
+    2.  [POST request](#orgc2d9691)
 
 
-<a id="org974c2b4"></a>
+<a id="orgfadf536"></a>
 
 # dht22-API
 
@@ -14,7 +17,7 @@ A simple API written in Go for the temperature and humidity dht22 sensor.
 It supports GET and POST requests
 
 
-<a id="orgdbe5deb"></a>
+<a id="org2ff2401"></a>
 
 # Requirements
 
@@ -28,7 +31,7 @@ OR
 -   docker-compose
 
 
-<a id="org867a2e3"></a>
+<a id="orge330080"></a>
 
 # Setup
 
@@ -61,4 +64,66 @@ than compiling MongoDB ourselves.
         
         Visit [localhost:8080/measurements](http://localhost:8080/measurements)
         to verify that everything work as they should, you are expected to see an empty list
+
+
+<a id="orge594679"></a>
+
+# GET and POST requests description
+
+
+<a id="org5c43d03"></a>
+
+## GET request
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Path</th>
+<th scope="col" class="org-left">Result</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td class="org-left">/measurements</td>
+<td class="org-left">Returns a list with all measurements or an empty list</td>
+</tr>
+
+
+<tr>
+<td class="org-left">/measurements/{id}</td>
+<td class="org-left">Returns the one measurement with the specified {id} or 404</td>
+</tr>
+
+
+<tr>
+<td class="org-left">/measurements/{name}</td>
+<td class="org-left">Returns all measurements from the sensor with the {name} or an empty list</td>
+</tr>
+</tbody>
+</table>
+
+
+<a id="orgc2d9691"></a>
+
+## POST request
+
+POST request consists of three optional parameters (id is assigned automatically by the server).
+
+Example of POST request with [cURL](https://en.wikipedia.org/wiki/CURL)
+
+    curl -d '{
+    
+        "name":"basement",
+        "temperature":"17.25",
+        "humidity":"21.33"
+    
+    }' -H "Content-Type: application/json" -X POST http://localhost:8080/measurements
 

@@ -105,7 +105,7 @@ than compiling MongoDB ourselves.
 
 <tr>
 <td class="org-left">/measurements/{name}</td>
-<td class="org-left">Returns all measurements from the sensor with the {name} or an empty list</td>
+<td class="org-left">Returns all measurements from the sensor with the specified {name} or an empty list</td>
 </tr>
 </tbody>
 </table>
